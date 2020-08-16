@@ -1,10 +1,11 @@
 from dimension_nodes import dimension_nodes
-#from linux_ec2_instances import *
+from linux_ec2_instances import *
 from windows_ec2_instances import *
 from dimension import calculate_dimension_tco
 from ec2 import calculate_ec2_tco_with_blind_spot, calculate_ec2_tco_without_blind_spot
 
 import xlsxwriter
+import numpy
 
 
 storage_start = 00
@@ -15,8 +16,12 @@ vm_start = 50
 vm_end = 2050
 vm_increment = 50
 
+
+
 def build_ec2_cost_curves(instance):
     all_ec2_cost_curves = []
+    all_dimension_cost_curves = []
+
     flags = [False, True]
       
     for blind_cost_flag in flags:
@@ -25,6 +30,14 @@ def build_ec2_cost_curves(instance):
             dimension = dimension_node.copy()
             dimension["vCPU"] = instance["vCPU"]
             dimension["memory"] = instance["memory"]
+
+            dimension_cost_curve = []
+            dimension_cost_curve.append(dimension_node_type + "_" + str(instance["vCPU"]) + "_" + str(instance["memory"]))
+            for number_of_vms in range(vm_start, vm_end, vm_increment):
+                racks, dimension_tco = calculate_dimension_tco(dimension, number_of_vms)
+                dimension_cost_curve.append(str(round(dimension_tco/number_of_vms, 2)))
+
+            all_dimension_cost_curves.append(dimension_cost_curve)
 
             for storage in range(storage_start, storage_end, storage_increment):
                 ec2_cost_curve = []
@@ -36,13 +49,14 @@ def build_ec2_cost_curves(instance):
 
                 all_ec2_cost_curves.append(ec2_cost_curve)
 
-    return all_ec2_cost_curves
+    return all_dimension_cost_curves, all_ec2_cost_curves
 
 def build_competitive_matrix(instance):
 
     intersection_points = {}
     transformed_competitive_matrix = []
     titles = ["M1s Medium without oversubscription", "M1s Medium with oversubscription", "M1d Medium without oversubscription", "M1d Medium with oversubscription"]
+    blank = ["  ", "  ", "  ", "  ", "  "]
     competitive_matrix = []
     flags = [False, True]
       
@@ -62,7 +76,7 @@ def build_competitive_matrix(instance):
 
                     if dimension_tco_per_vm <= ec2_tco_per_vm:
                         percentage_better = round((ec2_tco_per_vm - dimension_tco_per_vm) * 100 / dimension_tco_per_vm, 1)
-                        intersection_points[storage] = str(number_of_vms) + " (" + str(percentage_better) + "%)"
+                        intersection_points[storage] = str(number_of_vms) #+ " (" + str(percentage_better) + "%)"
                         break
 
                     intersection_points[storage] = "EC2 better"
@@ -84,6 +98,7 @@ def build_competitive_matrix(instance):
 
     transformed_competitive_matrix.insert(0, instance_name_without)
     transformed_competitive_matrix.insert(length + 1 , instance_name_with)
+    transformed_competitive_matrix.append(blank)
 
     return transformed_competitive_matrix
 
@@ -104,13 +119,18 @@ def write_to_excel(file_name, data):
 
     workbook.close()
 
-cost_curve_data = []
+ec2_cost_curve_data = []
+dimension_cost_curve_data = []
 competitive_matrix_data = []
 
-for instance_name, instance in all_ec2_instances_windows_32.items():
+for instance_name, instance in all_ec2_instances_windows_8.items():
 
-    cost_curve_data.extend(build_ec2_cost_curves(instance))
+    a, b = build_ec2_cost_curves(instance)
+    dimension_cost_curve_data.extend(a)
+    ec2_cost_curve_data.extend(b)
+    
     competitive_matrix_data.extend(build_competitive_matrix(instance))
 
-    write_to_excel("Windows_32vCPU_Cost_Curves.xlsx", cost_curve_data)
-    write_to_excel("Windows_32vCPU_Competitive_Matrix.xlsx", competitive_matrix_data)
+    write_to_excel("Windows_8vCPU_Dimension_Cost_Curves.xlsx", numpy.unique(dimension_cost_curve_data, axis = 0))
+    write_to_excel("Windows_8vCPU_EC2_Cost_Curves.xlsx", ec2_cost_curve_data)
+    write_to_excel("Windows_8vCPU_Competitive_Matrix.xlsx", competitive_matrix_data)
