@@ -6,6 +6,7 @@ from ec2 import calculate_ec2_tco_with_blind_spot, calculate_ec2_tco_without_bli
 
 import xlsxwriter
 import numpy
+import math
 
 
 storage_start = 00
@@ -123,7 +124,7 @@ ec2_cost_curve_data = []
 dimension_cost_curve_data = []
 competitive_matrix_data = []
 
-for instance_name, instance in all_ec2_instances_windows_8.items():
+for instance_name, instance in all_ec2_instances_windows_32.items():
 
     a, b = build_ec2_cost_curves(instance)
     dimension_cost_curve_data.extend(a)
@@ -131,6 +132,6 @@ for instance_name, instance in all_ec2_instances_windows_8.items():
     
     competitive_matrix_data.extend(build_competitive_matrix(instance))
 
-    write_to_excel("Windows_8vCPU_Dimension_Cost_Curves.xlsx", numpy.unique(dimension_cost_curve_data, axis = 0))
-    write_to_excel("Windows_8vCPU_EC2_Cost_Curves.xlsx", ec2_cost_curve_data)
-    write_to_excel("Windows_8vCPU_Competitive_Matrix.xlsx", competitive_matrix_data)
+    write_to_excel("Windows_32vCPU_Dimension_Cost_Curves.xlsx", numpy.unique(dimension_cost_curve_data, axis = 0))
+    write_to_excel("Windows_32vCPU_EC2_Cost_Curves.xlsx", ec2_cost_curve_data)
+    write_to_excel("Windows_32vCPU_Competitive_Matrix.xlsx", competitive_matrix_data)

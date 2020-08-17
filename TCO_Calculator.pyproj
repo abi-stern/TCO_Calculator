@@ -21,6 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="azure.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="windows_ec2_instances.py">
       <SubType>Code</SubType>
     </Compile>
