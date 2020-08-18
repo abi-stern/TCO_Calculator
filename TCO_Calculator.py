@@ -1,8 +1,10 @@
 from dimension_nodes import dimension_nodes
 from linux_ec2_instances import *
 from windows_ec2_instances import *
+from azure_instances import *
 from dimension import calculate_dimension_tco
 from ec2 import calculate_ec2_tco_with_blind_spot, calculate_ec2_tco_without_blind_spot
+from azure import calculate_azure_tco_without_blind_spot, calculate_azure_tco_with_blind_spot
 
 import xlsxwriter
 import numpy
@@ -103,6 +105,56 @@ def build_competitive_matrix(instance):
 
     return transformed_competitive_matrix
 
+def build_competitive_matrix_azure(instance, scenario):
+
+    intersection_points = {}
+    transformed_competitive_matrix = []
+    titles = ["M1s Medium without oversubscription", "M1s Medium with oversubscription", "M1d Medium without oversubscription", "M1d Medium with oversubscription"]
+    blank = ["  ", "  ", "  ", "  ", "  "]
+    competitive_matrix = []
+    flags = [False, True]
+      
+    for blind_cost_flag in flags:
+        competitive_matrix = []
+        for dimension_node_type, dimension_node in dimension_nodes.items():
+            dimension = dimension_node.copy()
+            dimension["vCPU"] = instance["vCPU"]
+            dimension["memory"] = instance["memory"]
+
+            for storage in range(storage_start, storage_end, storage_increment):
+                for number_of_vms in range(vm_start, vm_end, vm_increment):
+
+                    number_of_racks, dimension_tco = calculate_dimension_tco(dimension, number_of_vms)
+                    dimension_tco_per_vm = dimension_tco / number_of_vms
+                    azure_tco_per_vm = calculate_azure_tco_with_blind_spot(instance, dimension, number_of_vms, storage, scenario) / number_of_vms if blind_cost_flag else calculate_azure_tco_without_blind_spot(instance, dimension, number_of_vms, storage, scenario) / number_of_vms
+
+                    if dimension_tco_per_vm <= azure_tco_per_vm:
+                        percentage_better = round((azure_tco_per_vm - dimension_tco_per_vm) * 100 / dimension_tco_per_vm, 1)
+                        intersection_points[storage] = str(number_of_vms) #+ " (" + str(percentage_better) + "%)"
+                        break
+
+                    intersection_points[storage] = "Azure better"
+
+            competitive_matrix.append([value for key, value in intersection_points.items()])
+
+        i = 0
+        for storage in range(storage_start, storage_end, storage_increment):
+            temp = []
+            for j in range(0, len(competitive_matrix), 1):
+                temp.append(competitive_matrix[j][i])
+            i = i + 1
+            transformed_competitive_matrix.append([str(storage) + " Gb"] + temp)
+
+    instance_name_with = [instance["name"] +  " with blind cost"] + titles
+    instance_name_without = [instance["name"] +  " without blind cost"] + titles
+        
+    length = len(list(range(storage_start, storage_end, storage_increment)))
+
+    transformed_competitive_matrix.insert(0, instance_name_without)
+    transformed_competitive_matrix.insert(length + 1 , instance_name_with)
+    transformed_competitive_matrix.append(blank)
+
+    return transformed_competitive_matrix
 
 def write_to_excel(file_name, data):
     workbook = xlsxwriter.Workbook(file_name)
@@ -124,14 +176,22 @@ ec2_cost_curve_data = []
 dimension_cost_curve_data = []
 competitive_matrix_data = []
 
-for instance_name, instance in all_ec2_instances_windows_32.items():
+#for instance_name, instance in all_ec2_instances_windows_32.items():
 
-    a, b = build_ec2_cost_curves(instance)
-    dimension_cost_curve_data.extend(a)
-    ec2_cost_curve_data.extend(b)
+#    a, b = build_ec2_cost_curves(instance)
+#    dimension_cost_curve_data.extend(a)
+#    ec2_cost_curve_data.extend(b)
     
-    competitive_matrix_data.extend(build_competitive_matrix(instance))
+#    competitive_matrix_data.extend(build_competitive_matrix(instance))
 
-    write_to_excel("Windows_32vCPU_Dimension_Cost_Curves.xlsx", numpy.unique(dimension_cost_curve_data, axis = 0))
-    write_to_excel("Windows_32vCPU_EC2_Cost_Curves.xlsx", ec2_cost_curve_data)
-    write_to_excel("Windows_32vCPU_Competitive_Matrix.xlsx", competitive_matrix_data)
+#    write_to_excel("Windows_32vCPU_Dimension_Cost_Curves.xlsx", numpy.unique(dimension_cost_curve_data, axis = 0))
+#    write_to_excel("Windows_32vCPU_EC2_Cost_Curves.xlsx", ec2_cost_curve_data)
+#    write_to_excel("Windows_32vCPU_Competitive_Matrix.xlsx", competitive_matrix_data)
+
+
+for instance_name, instance in all_azure_instances_32.items():
+
+    scenario = "windows_with_hybrid_benefit"
+    competitive_matrix_data.extend(build_competitive_matrix_azure(instance, scenario))
+    write_to_excel("Linux_Hybrid_32vCPU_Competitive_Matrix_Azure.xlsx", competitive_matrix_data)
+    #write_to_excel("Windows_32vCPU_Competitive_Matrix_Azure.xlsx", competitive_matrix_data)

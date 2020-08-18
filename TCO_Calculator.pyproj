@@ -24,6 +24,12 @@
     <Compile Include="azure.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="azure_instances.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="data.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="windows_ec2_instances.py">
       <SubType>Code</SubType>
     </Compile>

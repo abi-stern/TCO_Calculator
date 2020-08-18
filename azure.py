@@ -5,26 +5,26 @@ from dimension import calculate_dimension_tco
 from azure_instances import managed_disk
 
 cisco_csr = {
-    "t2.medium_infra" : 12, 
-    "t2.medium_software" : 1942, 
-    "c4.2xlarge_infra" : 113, 
-    "c4.2xlarge_software" : 5804,
-    "c4.4xlarge_infra" : 226, 
-    "c4.4xlarge_software" : 7572,
+    "F2s_infra" : 28.33, 
+    "F2s_software" : 1942, 
+    "F8s_infra" : 114.78, 
+    "F8s_software" : 5804,
+    "F16s_infra" : 229.59, 
+    "F16s_software" : 7572,
     }
 
 def calculate_security_cost(number_of_vms, number_of_racks):
     if number_of_vms <=10:
-        infra = 36 * cisco_csr["t2.medium_infra"] * number_of_racks / 1000 
-        software = 3 * cisco_csr["t2.medium_software"] * number_of_racks / 1000 
+        infra = 36 * cisco_csr["F2s_infra"] * number_of_racks / 1000 
+        software = 3 * cisco_csr["F2s_software"] * number_of_racks / 1000 
         return infra + software
     elif number_of_vms <= 50:
-        infra = 36 * cisco_csr["c4.2xlarge_infra"] * number_of_racks / 1000 
-        software = 3 * cisco_csr["c4.2xlarge_software"] * number_of_racks / 1000 
+        infra = 36 * cisco_csr["F8s_infra"] * number_of_racks / 1000 
+        software = 3 * cisco_csr["F8s_software"] * number_of_racks / 1000 
         return infra + software
     else:
-        infra = 36 * cisco_csr["c4.4xlarge_infra"] * number_of_racks / 1000 
-        software = 3 * cisco_csr["c4.4xlarge_software"] * number_of_racks / 1000 
+        infra = 36 * cisco_csr["F16s_infra"] * number_of_racks / 1000 
+        software = 3 * cisco_csr["F16s_software"] * number_of_racks / 1000 
         return infra + software
 
 def calculate_blind_spot_cost(instance, number_of_vms):
@@ -42,13 +42,15 @@ def calculate_azure_tco_without_blind_spot(instance, dimension, number_of_vms, s
 
     egress_cost = instance["egress"] * upfront_cost
 
-    managed_disk_cost = number_of_vms * managed_disk[pow(2, math.ceil(math.log2(storage)))] * 36 / 1000
+    managed_disk_cost = 0 
+    if storage > 0 :
+        managed_disk_cost = number_of_vms * managed_disk[pow(2, math.ceil(math.log2(storage)))] * 36 / 1000
 
     number_of_racks, dimension_tco = calculate_dimension_tco(dimension, number_of_vms)
 
     security_cost = calculate_security_cost(number_of_vms, number_of_racks)
 
-    return upfront_cost + egress_cost + ebs_cost + security_cost
+    return upfront_cost + egress_cost + managed_disk_cost + security_cost
 
 
 def calculate_azure_tco_with_blind_spot(instance, dimension, number_of_vms, storage, scenario):
