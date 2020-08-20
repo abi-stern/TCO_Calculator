@@ -1,5 +1,6 @@
+all_ec2_instances_windows = {
 
-all_ec2_instances_windows_2 = {
+"all_ec2_instances_windows_02" : {
 
     "M5.large" : {
         "name" : "M5.large",
@@ -227,7 +228,7 @@ all_ec2_instances_windows_2 = {
 }
 
 
-all_ec2_instances_windows_4 = {
+, "all_ec2_instances_windows_04" : {
 
     "M5.xlarge" : {
         "name" : "M5.xlarge",
@@ -455,7 +456,7 @@ all_ec2_instances_windows_4 = {
 }
 
 
-all_ec2_instances_windows_8 = {
+, "all_ec2_instances_windows_08" : {
 
     "M5.2xlarge" : {
         "name" : "M5.2xlarge",
@@ -683,7 +684,7 @@ all_ec2_instances_windows_8 = {
 }
 
 
-all_ec2_instances_windows_16 = {
+, "all_ec2_instances_windows_16" : {
 
     "M5.4xlarge" : {
         "name" : "M5.4xlarge",
@@ -896,7 +897,7 @@ all_ec2_instances_windows_16 = {
         },
 }
 
-all_ec2_instances_windows_32 = {
+, "all_ec2_instances_windows_32" : {
 
     "M5.8xlarge" : {
         "name" : "M5.8xlarge",
@@ -1108,4 +1109,5 @@ all_ec2_instances_windows_32 = {
         "reskilling" : 43000
         },
 
+}
 }

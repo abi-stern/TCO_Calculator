@@ -1,283 +1,32 @@
-all_azure_instances_32 = {
+def build_azure_cost_curves(instance, scenario):
+    all_azure_cost_curves = []
+    all_dimension_cost_curves = []
 
-    "D32a v4" : {
-        "name" : "D32a v4",
-        "vCPU" : 32,
-        "memory" : 128,
-        "Linux" : 430.2255,
-        "windows_with_hybrid_benefit" : 430.2255,
-        "windows" : 1504.7855,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
+    flags = [False, True]
+      
+    for blind_cost_flag in flags:
+        for dimension_node_type, dimension_node in dimension_nodes.items(): 
+            blind_cost = "with" if blind_cost_flag else "without"
+            dimension = dimension_node.copy()
+            dimension["vCPU"] = instance["vCPU"]
+            dimension["memory"] = instance["memory"]
 
-      "D32as v4" : {
-        "name" : "D32as v4",
-        "vCPU" : 32,
-        "memory" : 128,
-        "Linux" : 430.2255,
-        "windows_with_hybrid_benefit" : 430.2255,
-        "windows" : 1504.7855,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
-     
-     "D32d v4" : {
-        "name" : "D32d v4",
-        "vCPU" : 32,
-        "memory" : 128,
-        "Linux" : 501.5246,
-        "windows_with_hybrid_benefit" : 501.5246,
-        "windows" : 1576.0846,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    }, 
-     
-     "D32ds v4" : {
-        "name" : "D32ds v4",
-        "vCPU" : 32,
-        "memory" : 128,
-        "Linux" : 501.5246,
-        "windows_with_hybrid_benefit" : 501.5246,
-        "windows" : 1576.0846,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    }, 
-     
-     "D32 v4" : {
-        "name" : "D32 v4",
-        "vCPU" : 32,
-        "memory" : 128,
-        "Linux" : 426.0864,
-        "windows_with_hybrid_benefit" : 426.0864,
-        "windows" : 1500.6464,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    }, 
-     
-     "D32s v4" : {
-        "name" : "D32s v4",
-        "vCPU" : 32,
-        "memory" : 128,
-        "Linux" : 426.0864,
-        "windows_with_hybrid_benefit" : 426.0864,
-        "windows" : 1500.6464,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    }, 
-     
-    "D32 v3" : {
-        "name" : "D32 v3",
-        "vCPU" : 32,
-        "memory" : 128,
-        "Linux" : 430.3861,
-        "windows_with_hybrid_benefit" : 430.3861,
-        "windows" : 1504.9461,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    }, 
-     
-     "D32s v3" : {
-        "name" : "D32s v3",
-        "vCPU" : 32,
-        "memory" : 128,
-        "Linux" : 430.3861,
-        "windows_with_hybrid_benefit" : 430.3861,
-        "windows" : 1504.9461,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    }, 
+            dimension_cost_curve = []
+            dimension_cost_curve.append(dimension_node_type + "_" + str(instance["vCPU"]) + "_" + str(instance["memory"]))
+            for number_of_vms in range(vm_start, vm_end, vm_increment):
+                racks, dimension_tco = calculate_dimension_tco(dimension, number_of_vms)
+                dimension_cost_curve.append(str(round(dimension_tco/number_of_vms, 2)))
 
-    "F32s v2" : {
-        "name" : "F32s v2",
-        "vCPU" : 32,
-        "memory" : 64,
-        "Linux" : 181.0546,
-        "windows_with_hybrid_benefit" : 181.0546,
-        "windows" : 718.3346,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
-    
-    "F32" : {
-        "name" : "F32",
-        "vCPU" : 32,
-        "memory" : 64,
-        "Linux" : 362.1092,
-        "windows_with_hybrid_benefit" : 362.1092,
-        "windows" : 1436.6692,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
+            all_dimension_cost_curves.append(dimension_cost_curve)
 
-    "E32a v4" : {
-        "name" : "E32as v4",
-        "vCPU" : 32,
-        "memory" : 256,
-        "Linux" : 580.8902,
-        "windows_with_hybrid_benefit" : 580.8902,
-        "windows" : 1655.4502,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
+            for storage in range(storage_start, storage_end, storage_increment):
+                azure_cost_curve = []
+                azure_cost_curve.append(dimension["alias"] + "_" + instance["name"] + "_" + str(storage) + "_" + blind_cost)
+                for number_of_vms in range(vm_start, vm_end, vm_increment):
 
-    "E32as v4" : {
-        "name" : "E32as v4",
-        "vCPU" : 32,
-        "memory" : 256,
-        "Linux" : 580.8902,
-        "windows_with_hybrid_benefit" : 580.8902,
-        "windows" : 1655.4502,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
-    
-    "E32d v4" : {
-        "name" : "E32d v4",
-        "vCPU" : 32,
-        "memory" : 256,
-        "Linux" : 639.1369,
-        "windows_with_hybrid_benefit" : 639.1369,
-        "windows" : 1713.6969,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
+                    azure_tco_per_vm = calculate_azure_tco_with_blind_spot(instance, dimension, number_of_vms, storage, scenario) / number_of_vms if blind_cost_flag else calculate_azure_tco_without_blind_spot(instance, dimension, number_of_vms, storage, scenario) / number_of_vms
+                    azure_cost_curve.append(round(azure_tco_per_vm,2))
 
-    "E32ds v4" : {
-        "name" : "E32ds v4",
-        "vCPU" : 32,
-        "memory" : 256,
-        "Linux" : 639.1369,
-        "windows_with_hybrid_benefit" : 639.1369,
-        "windows" : 1713.6969,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
+                all_azure_cost_curves.append(azure_cost_curve)
 
-    "E32 v4" : {
-        "name" : "E32 v4",
-        "vCPU" : 32,
-        "memory" : 256,
-        "Linux" : 559.253,
-        "windows_with_hybrid_benefit" : 559.253,
-        "windows" : 1633.813,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
-
-     "E32s v4" : {
-        "name" : "E32s v4",
-        "vCPU" : 32,
-        "memory" : 256,
-        "Linux" : 559.253,
-        "windows_with_hybrid_benefit" : 559.253,
-        "windows" : 1633.813,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
-
-    "E32 v3" : {
-        "name" : "E32 v3",
-        "vCPU" : 32,
-        "memory" : 256,
-        "Linux" : 584.0803,
-        "windows_with_hybrid_benefit" : 584.0803,
-        "windows" : 1658.6403,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
-
-     "E32s v3" : {
-        "name" : "E32 v3",
-        "vCPU" : 32,
-        "memory" : 256,
-        "Linux" : 584.0803,
-        "windows_with_hybrid_benefit" : 584.0803,
-        "windows" : 1658.6403,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
-
-    "D14 v2" : {
-        "name" : "D14 v2",
-        "vCPU" : 32,
-        "memory" : 112,
-        "Linux" : 340.5815,
-        "windows_with_hybrid_benefit" : 340.5815,
-        "windows" : 877.8615,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
-
-    "DS14 v2" : {
-        "name" : "DS14 v2",
-        "vCPU" : 32,
-        "memory" : 112,
-        "Linux" : 340.5815,
-        "windows_with_hybrid_benefit" : 340.5815,
-        "windows" : 877.8615,
-        "price_per_month" :99.42,
-        "egress" : 0.05,
-        "discount" : 0.05,
-        "rehosting" : 111000,
-        "reskilling" : 43000
-    },
-
-}
+    return all_dimension_cost_curves, all_azure_cost_curves

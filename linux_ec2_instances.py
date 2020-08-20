@@ -1,4 +1,6 @@
-all_ec2_instances_linux_2 = {
+all_ec2_instances_linux = {
+
+"all_ec2_instances_linux_02" : {
 
     "M5.large" : {
         "name" : "M5.large",
@@ -226,7 +228,7 @@ all_ec2_instances_linux_2 = {
 }
 
 
-all_ec2_instances_linux_4 = {
+, "all_ec2_instances_linux_04" : {
 
     "M5.xlarge" : {
         "name" : "M5.xlarge",
@@ -454,7 +456,7 @@ all_ec2_instances_linux_4 = {
 }
 
 
-all_ec2_instances_linux_8 = {
+, "all_ec2_instances_linux_08" : {
 
     "M5.2xlarge" : {
         "name" : "M5.2xlarge",
@@ -682,7 +684,7 @@ all_ec2_instances_linux_8 = {
 }
 
 
-all_ec2_instances_linux_16 = {
+, "all_ec2_instances_linux_16" : {
 
     "M5.4xlarge" : {
         "name" : "M5.4xlarge",
@@ -895,7 +897,7 @@ all_ec2_instances_linux_16 = {
         },
 }
 
-all_ec2_instances_linux_32 = {
+, "all_ec2_instances_linux_32" : {
 
     "M5.8xlarge" : {
         "name" : "M5.8xlarge",
@@ -1106,4 +1108,5 @@ all_ec2_instances_linux_32 = {
         "rehosting" : 111000,
         "reskilling" : 43000
         },
+}
 }
