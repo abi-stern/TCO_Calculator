@@ -192,47 +192,6 @@ def build_competitive_matrix_azure(instance, scenario):
 
     return transformed_competitive_matrix
 
-def build_customer_scenario_matrix(instance):
-
-    #titles = [instance["name"], "M1s no blind", "M1s blind", "M1s_over no blind", "M1s_over blind"]
-    blank = ["  ", "  ", "  ", "  ", "  "]
-    flags = [False, True]
-    
-    all_customer_scenarios = []
-        
-    customer_scenarios = []
-    formatted = []
-    for storage in storage_range:
-        for number_of_vms in vm_range:
-            for dimension_node_type, dimension_node in dimension_nodes.items():
-                dimension = dimension_node.copy()
-                dimension["vCPU"] = instance["vCPU"]
-                dimension["memory"] = instance["memory"]
-
-                number_of_racks, dimension_tco = calculate_dimension_tco(dimension, number_of_vms)
-                dimension_tco_per_vm = dimension_tco / number_of_vms
-                ec2_tco_per_vm_with_blind = calculate_ec2_tco_with_blind_spot(instance, dimension, number_of_vms, storage) / number_of_vms 
-                ec2_tco_per_vm_without_blind = calculate_ec2_tco_without_blind_spot(instance, dimension, number_of_vms, storage) / number_of_vms
-
-                percentage_better = round((ec2_tco_per_vm_without_blind - dimension_tco_per_vm) * 100 / dimension_tco_per_vm, 1)
-                customer_scenarios.append(str(percentage_better) + "%")
-                percentage_better = round((ec2_tco_per_vm_with_blind - dimension_tco_per_vm) * 100 / dimension_tco_per_vm, 1)
-                customer_scenarios.append(str(percentage_better) + "%")
-
-
-            formatted.append(customer_scenarios[0] + " / " + customer_scenarios[2])
-            formatted.append(customer_scenarios[1] + " / " + customer_scenarios[3])
-            formatted.append(customer_scenarios[4] + " / " + customer_scenarios[6])
-            formatted.append(customer_scenarios[5] + " / " + customer_scenarios[7])
-
-            formatted.append("    ")
-            customer_scenarios = []
-
-        all_customer_scenarios.append(formatted)
-        formatted = []
-
-    print(all_customer_scenarios)
-    return all_customer_scenarios
 
 def write_to_excel(file_name, data):
     workbook = xlsxwriter.Workbook(file_name)
@@ -256,117 +215,169 @@ dimension_cost_curve_data = []
 competitive_matrix_data = []
 
 
-#for instance_family_name, instance_family in all_ec2_instances_windows.items():
-#    competitive_matrix_data = []
-#    dimension_cost_curve_data = []
-#    ec2_cost_curve_data = []
-#    for instance_name, instance in instance_family.items():
+for instance_family_name, instance_family in all_ec2_instances_windows.items():
+    competitive_matrix_data = []
+    dimension_cost_curve_data = []
+    ec2_cost_curve_data = []
+    for instance_name, instance in instance_family.items():
         
-#        a, b = build_ec2_cost_curves(instance)
-#        dimension_cost_curve_data.extend(a)
-#        ec2_cost_curve_data.extend(b)
+        a, b = build_ec2_cost_curves(instance)
+        dimension_cost_curve_data.extend(a)
+        ec2_cost_curve_data.extend(b)
     
-#        competitive_matrix_data.extend(build_competitive_matrix(instance))
+        competitive_matrix_data.extend(build_competitive_matrix(instance))
 
-#        write_to_excel("windows_" + instance_family_name[-2:] + "vcpu_dimension_cost_curves.xlsx", numpy.unique(dimension_cost_curve_data, axis = 0))
-#        write_to_excel("windows_" + instance_family_name[-2:] + "vcpu_ec2_cost_curves.xlsx", ec2_cost_curve_data)
-#        write_to_excel("windows_" + instance_family_name[-2:] + "vcpu_competitive_matrix.xlsx", competitive_matrix_data)
+        write_to_excel("windows_" + instance_family_name[-2:] + "vcpu_dimension_cost_curves.xlsx", numpy.unique(dimension_cost_curve_data, axis = 0))
+        write_to_excel("windows_" + instance_family_name[-2:] + "vcpu_ec2_cost_curves.xlsx", ec2_cost_curve_data)
+        write_to_excel("windows_" + instance_family_name[-2:] + "vcpu_competitive_matrix.xlsx", competitive_matrix_data)
 
 
-#for instance_family_name, instance_family in all_ec2_instances_linux.items():
-#    competitive_matrix_data = []
-#    dimension_cost_curve_data = []
-#    ec2_cost_curve_data = []
-#    for instance_name, instance in instance_family.items():
+for instance_family_name, instance_family in all_ec2_instances_linux.items():
+    competitive_matrix_data = []
+    dimension_cost_curve_data = []
+    ec2_cost_curve_data = []
+    for instance_name, instance in instance_family.items():
 
-#        a, b = build_ec2_cost_curves(instance)
-#        dimension_cost_curve_data.extend(a)
-#        ec2_cost_curve_data.extend(b)
+        a, b = build_ec2_cost_curves(instance)
+        dimension_cost_curve_data.extend(a)
+        ec2_cost_curve_data.extend(b)
     
-#        competitive_matrix_data.extend(build_competitive_matrix(instance))
+        competitive_matrix_data.extend(build_competitive_matrix(instance))
 
-#        write_to_excel("linux_" + instance_family_name[-2:] + "vcpu_dimension_cost_curves.xlsx", numpy.unique(dimension_cost_curve_data, axis = 0))
-#        write_to_excel("linux_" + instance_family_name[-2:] + "vcpu_ec2_cost_curves.xlsx", ec2_cost_curve_data)
-        #write_to_excel("linux_" + instance_family_name[-2:] + "vcpu_competitive_matrix.xlsx", competitive_matrix_data)
+        write_to_excel("linux_" + instance_family_name[-2:] + "vcpu_dimension_cost_curves.xlsx", numpy.unique(dimension_cost_curve_data, axis = 0))
+        write_to_excel("linux_" + instance_family_name[-2:] + "vcpu_ec2_cost_curves.xlsx", ec2_cost_curve_data)
+        write_to_excel("linux_" + instance_family_name[-2:] + "vcpu_competitive_matrix.xlsx", competitive_matrix_data)
 
-#scenarios = ["windows", "windows_with_hybrid_benefit"]
+scenarios = ["windows", "windows_with_hybrid_benefit"]
 
-#for scenario in scenarios:
-#    for instance_family_name, instance_family in all_azure_instances.items():
-#        competitive_matrix_data = []
-#        azure_cost_curve_data = []
-#        dimension_cost_curve_data = []
-#        for instance_name, instance in instance_family.items():
+for scenario in scenarios:
+    for instance_family_name, instance_family in all_azure_instances.items():
+        competitive_matrix_data = []
+        azure_cost_curve_data = []
+        dimension_cost_curve_data = []
+        for instance_name, instance in instance_family.items():
 
-#            a, b = build_azure_cost_curves(instance, scenario)
-#            dimension_cost_curve_data.extend(a)
-#            azure_cost_curve_data.extend(b)
+            a, b = build_azure_cost_curves(instance, scenario)
+            dimension_cost_curve_data.extend(a)
+            azure_cost_curve_data.extend(b)
 
-#            write_to_excel(scenario + "_" + instance_family_name[-2:] + "vCPU_Dimension_Cost_Curves.xlsx", numpy.unique(dimension_cost_curve_data, axis = 0))
-#            write_to_excel(scenario + "_" + instance_family_name[-2:] + "vCPU_Azure_Cost_Curves.xlsx", azure_cost_curve_data)
+            write_to_excel(scenario + "_" + instance_family_name[-2:] + "vCPU_Dimension_Cost_Curves.xlsx", numpy.unique(dimension_cost_curve_data, axis = 0))
+            write_to_excel(scenario + "_" + instance_family_name[-2:] + "vCPU_Azure_Cost_Curves.xlsx", azure_cost_curve_data)
 
-#            competitive_matrix_data.extend(build_competitive_matrix_azure(instance, scenario))
-#            write_to_excel(scenario + "_" + instance_family_name[-2:] + "vCPU_Competitive_Matrix_Azure.xlsx", competitive_matrix_data)
+            competitive_matrix_data.extend(build_competitive_matrix_azure(instance, scenario))
+            write_to_excel(scenario + "_" + instance_family_name[-2:] + "vCPU_Competitive_Matrix_Azure.xlsx", competitive_matrix_data)
             
-#storage_range = [1000]
-#vm_range = [100, 500, 1000]
 
-#a = build_customer_scenario_matrix(all_ec2_instances_windows_32["M5.8xlarge"])
-#write_to_excel("M5.xlsx", a)
-#a = build_customer_scenario_matrix(all_ec2_instances_windows_32["R5.8xlarge"])
-#write_to_excel("R5.xlsx", a)
-#a = build_customer_scenario_matrix(all_ec2_instances_windows_32["C5.9xlarge"])
-#write_to_excel("C5.xlsx", a)
-#a = build_customer_scenario_matrix(all_ec2_instances_windows_32["I3en.8xlarge"])
-#write_to_excel("I3en.xlsx", a)
+#ec2_instances = [[100, all_ec2_instances_windows["all_ec2_instances_windows_02"]["I3.large"]], 
+#             [200, all_ec2_instances_windows["all_ec2_instances_windows_04"]["I3.xlarge"]], 
+#             [300, all_ec2_instances_windows["all_ec2_instances_windows_08"]["I3.2xlarge"]], 
+#             [400, all_ec2_instances_windows["all_ec2_instances_windows_16"]["I3.4xlarge"]], 
+#             ]
 
 #ec2_instances = [[100, all_ec2_instances_linux["all_ec2_instances_linux_02"]["I3.large"]], 
 #             [200, all_ec2_instances_linux["all_ec2_instances_linux_04"]["I3.xlarge"]], 
 #             [300, all_ec2_instances_linux["all_ec2_instances_linux_08"]["I3.2xlarge"]], 
 #             [400, all_ec2_instances_linux["all_ec2_instances_linux_16"]["I3.4xlarge"]], 
 #             ]
-
 #ec2_instances = [[100, all_azure_instances["all_azure_instances_02"]["F2"]], 
 #             [200, all_azure_instances["all_azure_instances_04"]["F4"]], 
 #             [300, all_azure_instances["all_azure_instances_08"]["F8"]], 
 #             [400, all_azure_instances["all_azure_instances_16"]["F16"]], 
 #             ]
-ec2_instances = [[100, all_azure_instances["all_azure_instances_02"]["D2a v4"]], 
-             [200, all_azure_instances["all_azure_instances_04"]["D4a v4"]], 
-             [300, all_azure_instances["all_azure_instances_08"]["D8a v4"]], 
-             [400, all_azure_instances["all_azure_instances_16"]["D16a v4"]], 
-             ]
+#ec2_instances = [[100, all_azure_instances["all_azure_instances_02"]["D2d v4"]], 
+#             [200, all_azure_instances["all_azure_instances_04"]["D4d v4"]], 
+#             [300, all_azure_instances["all_azure_instances_08"]["D8d v4"]], 
+#             [400, all_azure_instances["all_azure_instances_16"]["D16d v4"]], 
+#             ]
+#ec2_instances = [[100, all_azure_instances["all_azure_instances_02"]["E2d v4"]], 
+#             [200, all_azure_instances["all_azure_instances_04"]["E4d v4"]], 
+#             [300, all_azure_instances["all_azure_instances_08"]["E8d v4"]], 
+#             [400, all_azure_instances["all_azure_instances_16"]["E16d v4"]], 
+#             ]
 #ec2_instances = [[100, all_azure_instances["all_azure_instances_02"]["E2a v4"]], 
 #             [200, all_azure_instances["all_azure_instances_04"]["L4s"]], 
 #             [300, all_azure_instances["all_azure_instances_08"]["L8s"]], 
 #             [400, all_azure_instances["all_azure_instances_16"]["L16s"]], 
 #             ]
 
-vm_range = [150, 500, 1500]
-efficiency_matrix = []
-for storage, instance in ec2_instances:
-    with_row = []
-    without_row = []
-    for vm in vm_range:
+#vm_range = [150, 500, 1500]
+#efficiency_matrix = []
+#scenario = "windows_with_hybrid_benefit"
+#for storage, instance in ec2_instances:
+#    with_row = []
+#    without_row = []
+#    for vm in vm_range:
+#        dimension_no_oversubscription = dimension_nodes["m1s_no_oversubscription"].copy()
+#        dimension_no_oversubscription["vCPU"] = instance["vCPU"]
+#        dimension_no_oversubscription["memory"] = instance["memory"]
+
+#        dimension_oversubscription = dimension_nodes["m1s_oversubscription"].copy()
+#        dimension_oversubscription["vCPU"] = instance["vCPU"]
+#        dimension_oversubscription["memory"] = instance["memory"]
+#        x, a = calculate_dimension_tco(dimension_no_oversubscription, vm)
+#        #b = calculate_ec2_tco_with_blind_spot(instance, dimension_no_oversubscription, vm, storage)
+#        b = calculate_azure_tco_with_blind_spot(instance, dimension_no_oversubscription, vm, storage, scenario)
         
-        x, a = calculate_dimension_tco(dimension_nodes["m1d_no_oversubscription"], vm)
-        #b = calculate_ec2_tco_with_blind_spot(instance, dimension_nodes["m1s_no_oversubscription"], vm, storage)
-        b = calculate_azure_tco_with_blind_spot(instance, dimension_nodes["m1d_no_oversubscription"], vm, storage, "windows_with_hybrid_benefit")
-        p = round(math.ceil((b-a)*100/a),1)
-        x, a = calculate_dimension_tco(dimension_nodes["m1d_oversubscription"], vm)
-        q = round(math.ceil((b-a)*100/a),1)
-        with_row.append(str(p) + "% / " + str(q) + "%")
+#        p = round(math.ceil((b-a)*100/a),1)
+
+#        x, a = calculate_dimension_tco(dimension_oversubscription, vm)
+#        #b = calculate_ec2_tco_with_blind_spot(instance, dimension_oversubscription, vm, storage)
+#        b = calculate_azure_tco_with_blind_spot(instance, dimension_oversubscription, vm, storage, scenario)
+#        q = round(math.ceil((b-a)*100/a),1)
+#        with_row.append(str(p) + "% / " + str(q) + "%")
 
         
-        x, a = calculate_dimension_tco(dimension_nodes["m1d_no_oversubscription"], vm)
-        #b = calculate_ec2_tco_without_blind_spot(instance, dimension_nodes["m1s_no_oversubscription"], vm, storage)
-        b = calculate_azure_tco_without_blind_spot(instance, dimension_nodes["m1d_no_oversubscription"], vm, storage, "windows_with_hybrid_benefit")
-        p = round(math.ceil((b-a)*100/a),1)
-        x, a = calculate_dimension_tco(dimension_nodes["m1d_no_oversubscription"], vm)
-        q = round(math.ceil((b-a)*100/a),1)
-        without_row.append(str(p) + "% / " + str(q) + "%")
+#        x, a = calculate_dimension_tco(dimension_no_oversubscription, vm)
+#        #b = calculate_ec2_tco_without_blind_spot(instance, dimension_no_oversubscription, vm, storage)
+#        b = calculate_azure_tco_without_blind_spot(instance, dimension_no_oversubscription, vm, storage, scenario)
+#        p = round(math.ceil((b-a)*100/a),1)
+#        x, a = calculate_dimension_tco(dimension_oversubscription, vm)
+#        #b = calculate_ec2_tco_without_blind_spot(instance, dimension_oversubscription, vm, storage)
+#        b = calculate_azure_tco_without_blind_spot(instance, dimension_oversubscription, vm, storage, scenario)
 
-    efficiency_matrix.append(with_row)
-    efficiency_matrix.append(without_row)
+#        q = round(math.ceil((b-a)*100/a),1)
+#        without_row.append(str(p) + "% / " + str(q) + "%")
 
-write_to_excel("efficiency.xlsx", efficiency_matrix)
+#    efficiency_matrix.append(with_row)
+#    efficiency_matrix.append(without_row)
+
+#write_to_excel("m1s_efficiency.xlsx", efficiency_matrix)
+
+#efficiency_matrix = []
+#for storage, instance in ec2_instances:
+#    with_row = []
+#    without_row = []
+#    for vm in vm_range:
+#        dimension_no_oversubscription = dimension_nodes["m1d_no_oversubscription"].copy()
+#        dimension_no_oversubscription["vCPU"] = instance["vCPU"]
+#        dimension_no_oversubscription["memory"] = instance["memory"]
+
+#        dimension_oversubscription = dimension_nodes["m1d_oversubscription"].copy()
+#        dimension_oversubscription["vCPU"] = instance["vCPU"]
+#        dimension_oversubscription["memory"] = instance["memory"]
+#        x, a = calculate_dimension_tco(dimension_no_oversubscription, vm)
+#        #b = calculate_ec2_tco_with_blind_spot(instance, dimension_no_oversubscription, vm, storage)
+#        b = calculate_azure_tco_with_blind_spot(instance, dimension_no_oversubscription, vm, storage, scenario)
+#        p = round(math.ceil((b-a)*100/a),1)
+
+#        x, a = calculate_dimension_tco(dimension_oversubscription, vm)
+#        #b = calculate_ec2_tco_with_blind_spot(instance, dimension_oversubscription, vm, storage)
+#        b = calculate_azure_tco_with_blind_spot(instance, dimension_oversubscription, vm, storage, scenario)
+#        q = round(math.ceil((b-a)*100/a),1)
+#        with_row.append(str(p) + "% / " + str(q) + "%")
+
+        
+#        x, a = calculate_dimension_tco(dimension_no_oversubscription, vm)
+#        #b = calculate_ec2_tco_without_blind_spot(instance, dimension_no_oversubscription, vm, storage)
+#        b = calculate_azure_tco_without_blind_spot(instance, dimension_no_oversubscription, vm, storage, scenario)
+#        p = round(math.ceil((b-a)*100/a),1)
+#        x, a = calculate_dimension_tco(dimension_oversubscription, vm)
+#        #b = calculate_ec2_tco_without_blind_spot(instance, dimension_oversubscription, vm, storage)
+#        b = calculate_azure_tco_without_blind_spot(instance, dimension_oversubscription, vm, storage, scenario)
+#        q = round(math.ceil((b-a)*100/a),1)
+#        without_row.append(str(p) + "% / " + str(q) + "%")
+
+#    efficiency_matrix.append(with_row)
+#    efficiency_matrix.append(without_row)
+
+#write_to_excel("m1d_efficiency.xlsx", efficiency_matrix)

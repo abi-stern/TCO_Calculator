@@ -342,7 +342,7 @@ all_ec2_instances_windows = {
         "name" : "C5n.xlarge",
         "vCPU" : 4,
         "memory" : 8,
-        "price_per_month" : 189.44,
+        "price_per_month" : 194.14,
         "ebs_gb_month" : 0.10,
         "egress" : 0.05,
         "discount" : 0.05,
@@ -1010,7 +1010,7 @@ all_ec2_instances_windows = {
     "C5n.9xlarge" : {
         "name" : "C5n.9xlarge",
         "vCPU" : 32,
-        "memory" : 64,
+        "memory" : 96,
         "price_per_month" : 1747.36,
         "ebs_gb_month" : 0.10,
         "egress" : 0.05,

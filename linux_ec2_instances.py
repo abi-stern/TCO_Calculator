@@ -951,7 +951,7 @@ all_ec2_instances_linux = {
         "name" : "M5n.8xlarge",
         "vCPU" : 32,
         "memory" : 128,
-        "price_per_month" : 586.25,
+        "price_per_month" : 558.47,
         "ebs_gb_month" : 0.10,
         "egress" : 0.05,
         "discount" : 0.05,
@@ -1010,7 +1010,7 @@ all_ec2_instances_linux = {
     "C5n.9xlarge" : {
         "name" : "C5n.9xlarge",
         "vCPU" : 32,
-        "memory" : 64,
+        "memory" : 96,
         "price_per_month" : 538.50,
         "ebs_gb_month" : 0.10,
         "egress" : 0.05,
