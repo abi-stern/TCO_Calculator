@@ -96,7 +96,7 @@ def build_competitive_matrix(instance):
     blank = ["  ", "  ", "  ", "  ", "  "]
     competitive_matrix = []
     flags = [False, True]
-      
+    
     for blind_cost_flag in flags:
         competitive_matrix = []
         for dimension_node_type, dimension_node in dimension_nodes.items():
